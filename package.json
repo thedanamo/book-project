@@ -1,0 +1,19 @@
+{
+  "name": "book-project",
+  "version": "1.0.0",
+  "description": "Look at all them books",
+  "main": "server.js",
+  "repository": "https://github.com/thedanamo/book-project.git",
+  "author": "thedanamo",
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "knex": "^0.21.12",
+    "pg": "^8.5.1",
+    "postgres": "^1.0.2"
+  }
+}
