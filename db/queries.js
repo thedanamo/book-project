@@ -15,4 +15,13 @@ module.exports = {
   getBook(id) {
     return knex("books").where("id", id).first();
   },
+
+  // Update book by given id
+  update(id, book) {
+    return knex("books").where("id", id).update(book, "*");
+  },
+
+  delete(id) {
+    return knex("books").where("id", id).delete("*");
+  },
 };
