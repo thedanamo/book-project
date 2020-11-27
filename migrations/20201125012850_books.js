@@ -1,6 +1,6 @@
 exports.up = function (knex) {
   return knex.schema.createTable("books", (table) => {
-    table.increments(); // this represents the primary key.
+    table.increments(); // This will be the primary key.
     table.string("author");
     table.string("country");
     table.string("imageLink");
