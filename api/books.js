@@ -2,12 +2,12 @@ const express = require("express");
 
 const router = express.Router();
 
+const queries = require("../db/queries");
+
 router.get("/", (req, res) => {
-  res
-    .status(200)
-    .json(
-      "They've done studies you know. Sixty percent of the time it works every time.  "
-    );
+  queries.getAll().then((books) => {
+    res.status(200).json(books);
+  });
 });
 
 module.exports = router;

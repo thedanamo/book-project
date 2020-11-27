@@ -1,5 +1,7 @@
 const knex = require("./knex"); // knex connection
 
 module.exports = {
-  getAll() {},
+  getAll() {
+    return knex("books");
+  },
 };
