@@ -74,4 +74,18 @@ router.put("/:id", (req, res, next) => {
   }
 });
 
+// Endpoint to delete book with given id
+router.delete("/:id", (req, res, next) => {
+  const { id } = req.params;
+
+  queries.delete(id).then((books) => {
+    if (books) {
+      res.status(200).json(books);
+    } else {
+      res.status(404);
+      next(new Error("No books in database"));
+    }
+  });
+});
+
 module.exports = router;
