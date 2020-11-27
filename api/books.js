@@ -12,6 +12,13 @@ const isIdNumber = (req, res, next) => {
   return next();
 };
 
+// Checks if given book has required field, title
+const isValidBook = (book) => {
+  const hasTitle =
+    typeof book.title == "string" && book.title.trim().length !== 0;
+  return hasTitle;
+};
+
 // Endpoint to return all books
 router.get("/", (req, res) => {
   queries.getAll().then((books) => {
@@ -22,6 +29,19 @@ router.get("/", (req, res) => {
       next(new Error("No books in database"));
     }
   });
+});
+
+// Endpoint to add book to database
+router.post("/", (req, res, next) => {
+  const givenBook = req.body;
+  if (isValidBook(givenBook)) {
+    queries.create(givenBook).then((books) => {
+      res.status(201).json(books[0]);
+    });
+  } else {
+    res.status(400);
+    next(new Error("Invalid book object"));
+  }
 });
 
 // Endpoint to return a book by given id
