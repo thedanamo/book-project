@@ -5,4 +5,9 @@ module.exports = {
   getAll() {
     return knex("books");
   },
+
+  // Return book by given id
+  getBook(id) {
+    return knex("books").where("id", id).first();
+  },
 };
