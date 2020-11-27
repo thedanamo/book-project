@@ -37,6 +37,11 @@ router.get("/", (req, res) => {
 router.post("/", (req, res, next) => {
   const givenBook = req.body;
   if (isValidBook(givenBook)) {
+    // Set default stock to 5 if no stock given
+    if (!givenBook.stock) {
+      givenBook["stock"] = 5;
+    }
+
     queries.create(givenBook).then((books) => {
       res.status(201).json(books[0]);
     });
