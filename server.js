@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+const auth = require("./api/auth");
 const books = require("./api/books");
 
 const port = process.env.PORT || 9001;
@@ -9,6 +10,9 @@ const port = process.env.PORT || 9001;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// Auth api
+app.use("/api/auth", auth);
 
 // Book api
 app.use("/api/books", books);
