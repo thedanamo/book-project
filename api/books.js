@@ -1,7 +1,5 @@
 const express = require("express");
-
 const router = express.Router();
-
 const queries = require("../db/queries");
 
 // Middleware to validate that given id is a number
