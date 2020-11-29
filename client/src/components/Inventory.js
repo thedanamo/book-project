@@ -9,29 +9,46 @@ function Inventory() {
   const { status, allBooks, setNewBook, page, setPage, lastPage } = useContext(
     InventoryContext
   );
-  console.log(lastPage);
+
   return (
-    <InventoryContainer>
-      <h1>Book List</h1>
+    <>
+      <h2>Book List</h2>
       {status === "loading" && <Loading />}
       {status === "error" && "Error..."}
       {status === "success" && (
-        <Grid>
-          {allBooks.map((book) => {
-            const { title, author } = book;
-            return (
-              <BookCard
-                key={title + Math.random() * 100000}
-                title={title}
-                author={author}
-              />
-            );
-          })}
-        </Grid>
+        <InventoryContainer>
+          <Paginator active={page} lastPage={lastPage} setPage={setPage} />
+          <Grid>
+            {allBooks.map((book) => {
+              const {
+                title,
+                author,
+                imageLink,
+                link,
+                pages,
+                year,
+                language,
+                country,
+              } = book;
+              return (
+                <BookCard
+                  key={title + Math.random() * 100000}
+                  title={title}
+                  author={author}
+                  imgSrc={imageLink}
+                  link={link}
+                  language={language}
+                  pages={pages}
+                  country={country}
+                  year={year}
+                />
+              );
+            })}
+          </Grid>
+          <Paginator active={page} lastPage={lastPage} setPage={setPage} />
+        </InventoryContainer>
       )}
-
-      <Paginator active={page} lastPage={lastPage} setPage={setPage} />
-    </InventoryContainer>
+    </>
   );
 }
 

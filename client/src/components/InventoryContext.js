@@ -18,7 +18,6 @@ export const InventoryProvider = ({ children }) => {
       })
       .then((pagination) => {
         const { books, last_page } = pagination;
-        console.log(last_page);
         setAllBooks([...books]);
         setLastPage(last_page);
         setStatus("success");

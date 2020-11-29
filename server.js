@@ -10,7 +10,7 @@ const port = process.env.PORT || 9001;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-
+app.use(express.static("assets"));
 // Auth api
 app.use("/api/auth", auth);
 
