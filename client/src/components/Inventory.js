@@ -18,6 +18,7 @@ function Inventory() {
     lastPage,
     selectedlibrary,
     setSelectedlibrary,
+    setStockIncDec,
   } = useContext(InventoryContext);
 
   return (
@@ -60,11 +61,14 @@ function Inventory() {
                 year,
                 language,
                 country,
-                //stock,
+                stock,
               } = book;
+
               return (
                 <BookCard
                   key={title + id}
+                  id={id}
+                  libraryId={selectedlibrary}
                   title={title}
                   author={author}
                   imgSrc={imageLink}
@@ -73,7 +77,8 @@ function Inventory() {
                   pages={pages}
                   country={country}
                   year={year}
-                  // stock={stock}
+                  stock={stock}
+                  setStockIncDec={setStockIncDec}
                 />
               );
             })}

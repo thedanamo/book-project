@@ -8,8 +8,8 @@ export const InventoryProvider = ({ children }) => {
   const [inventoryPage, setInventoryPage] = useState(1);
   const [newBook, setNewBook] = useState(false); // Will be used to update list when new book added
   const [lastPage, setLastPage] = useState(1);
-
   const [selectedlibrary, setSelectedlibrary] = useState(null);
+  const [stockIncDec, setStockIncDec] = useState(null);
 
   useEffect(() => {
     const query = selectedlibrary ? "?library=" + selectedlibrary : "";
@@ -36,6 +36,38 @@ export const InventoryProvider = ({ children }) => {
     };
   }, [newBook, inventoryPage, selectedlibrary]);
 
+  useEffect(() => {
+    const awaitFetch = async () => {
+      try {
+        const res = await fetch(
+          "/api/books/" +
+            stockIncDec.mode +
+            "/" +
+            stockIncDec.bookId +
+            "?libraryId=" +
+            stockIncDec.libraryId,
+          {
+            method: "PUT",
+          }
+        );
+
+        const data = await res.json();
+        console.log(stockIncDec, data);
+      } catch (err) {
+        setStatus("error");
+        console.log(err);
+      }
+    };
+
+    if (stockIncDec) {
+      awaitFetch();
+    }
+
+    return () => {
+      setStockIncDec(null);
+    };
+  }, [stockIncDec]);
+
   return (
     <InventoryContext.Provider
       value={{
@@ -47,6 +79,7 @@ export const InventoryProvider = ({ children }) => {
         lastPage,
         selectedlibrary,
         setSelectedlibrary,
+        setStockIncDec,
       }}
     >
       {children}

@@ -25,6 +25,21 @@ module.exports = {
     return knex("books").where("id", id).delete("*");
   },
 
+  // Increment book stock by given book id and library id
+  increment(id, libraryId) {
+    return knex("library_book_references")
+      .increment("stock")
+      .where({ library_id: libraryId, book_id: id });
+  },
+
+  // Decrement book stock by given book id and library id
+  decrement(id, libraryId) {
+    return knex("library_book_references")
+      .decrement("stock")
+      .where({ library_id: libraryId, book_id: id });
+  },
+
+  // Get all books or books per library with pagination
   async getPage(offset, per_page, libraryId) {
     let query = knex("books").select("*").from("books");
 

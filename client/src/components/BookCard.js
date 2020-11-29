@@ -1,7 +1,10 @@
 import styled from "styled-components";
 import Button from "react-bootstrap/Button";
+import React, { useState } from "react";
 
 function BookCard({
+  id,
+  libraryId,
   title,
   author,
   imgSrc,
@@ -10,8 +13,18 @@ function BookCard({
   year,
   language,
   country,
-  //stock,
+  stock,
+  setStockIncDec,
 }) {
+  const [stockNumber, setStockNumber] = useState(stock);
+
+  const incrementOrDecrement = (mode) => {
+    setStockIncDec({ bookId: id, libraryId, mode });
+
+    //ToDo: add confirmation from context before updating stockNumber hook, optimistic atm
+    setStockNumber(mode === "increment" ? stockNumber + 1 : stockNumber - 1);
+  };
+
   return (
     <BookDiv>
       <div>
@@ -24,12 +37,38 @@ function BookCard({
         <div>Language: {language}</div>
         <div>Year: {year}</div>
         <div>Pages: {pages}</div>
-        {/* <div>Stock: {stock}</div> */}
+        {stock && (
+          <>
+            <div>Stock: {stockNumber}</div>
+            <ButtonContainer>
+              <StyledButton
+                variant="primary"
+                onClick={() => {
+                  incrementOrDecrement("decrement");
+                }}
+              >
+                -
+              </StyledButton>
+              <StyledButton
+                variant="primary"
+                onClick={() => {
+                  incrementOrDecrement("increment");
+                }}
+              >
+                +
+              </StyledButton>
+            </ButtonContainer>
+          </>
+        )}
       </InfoContainer>
       {link && <a href={link}>More info</a>}
       <ButtonContainer>
-        <StyledButton variant="primary">Edit</StyledButton>
-        <StyledButton variant="danger">Delete</StyledButton>
+        <StyledButton variant="primary" onClick={() => {}}>
+          Edit
+        </StyledButton>
+        <StyledButton variant="danger" onClick={() => {}}>
+          Delete
+        </StyledButton>
       </ButtonContainer>
     </BookDiv>
   );
@@ -60,6 +99,7 @@ const InfoContainer = styled.div`
 
 const ButtonContainer = styled.div`
   display: flex;
+  justify-content: center;
 `;
 
 const StyledButton = styled(Button)`

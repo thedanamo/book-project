@@ -24,7 +24,7 @@ router.param("id", isIdNumber);
 router.get("/", (req, res) => {
   queries.getAll().then((books) => {
     if (books) {
-      res.status(200).json(books);
+      res.json(books);
     } else {
       res.status(404);
       next(new Error("No books in database"));
@@ -51,7 +51,7 @@ router.get("/:id", (req, res, next) => {
 
   queries.getBook(id).then((book) => {
     if (book) {
-      res.status(200).json(book);
+      res.json(book);
     } else {
       res.status(404);
       next(new Error("Book with id " + id + " not found"));
@@ -79,12 +79,40 @@ router.delete("/:id", (req, res, next) => {
 
   queries.delete(id).then((books) => {
     if (books) {
-      res.status(200).json(books);
+      res.json(books);
     } else {
       res.status(404);
       next(new Error("No books in database"));
     }
   });
+});
+
+// Endpoint to find and increment stock of book with given id
+router.put("/increment/:id", (req, res, next) => {
+  const { id } = req.params;
+  const { libraryId } = req.query;
+  try {
+    queries.increment(id, libraryId).then((library_books) => {
+      res.json(library_books);
+    });
+  } catch (err) {
+    res.status(400);
+    next(new Error(err.message));
+  }
+});
+
+// Endpoint to find and decrement stock of book with given id
+router.put("/decrement/:id", (req, res, next) => {
+  const { id } = req.params;
+  const { libraryId } = req.query;
+  try {
+    queries.decrement(id, libraryId).then((library_books) => {
+      res.json(library_books);
+    });
+  } catch (err) {
+    res.status(400);
+    next(new Error(err.message));
+  }
 });
 
 // Endpoint to return books with pages information, 16 per page
