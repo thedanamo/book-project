@@ -41,7 +41,7 @@ router.get("/:id", (req, res, next) => {
 
 // TODO: **************************************************************** */
 // Endpoint to return libraries with pages information, 16 per page
-router.get("/pages/:page", async (req, res) => {
+router.get("/pages/:page", async (req, res, next) => {
   let { page } = req.params;
   const pagination = {};
   const per_page = 16;

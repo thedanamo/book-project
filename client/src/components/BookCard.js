@@ -17,7 +17,7 @@ function BookCard({
       <div>
         <span>{title}</span>
       </div>
-      <BookImg src={imgSrc} />
+      {imgSrc && <BookImg src={imgSrc} />}
       <InfoContainer>
         <div> Author: {author}</div>
         <div> Country: {country}</div>
