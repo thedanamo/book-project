@@ -1,16 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 export const InventoryContext = React.createContext(null);
 
 export const InventoryProvider = ({ children }) => {
-  const [allBooks, setAllBooks] = React.useState([]);
-  const [status, setStatus] = React.useState("loading");
-  const [inventoryPage, setInventoryPage] = React.useState(1);
-  const [newBook, setNewBook] = React.useState(false); // Will be used to update list when new book added
-  const [lastPage, setLastPage] = React.useState(1);
+  const [allBooks, setAllBooks] = useState([]);
+  const [status, setStatus] = useState("loading");
+  const [inventoryPage, setInventoryPage] = useState(1);
+  const [newBook, setNewBook] = useState(false); // Will be used to update list when new book added
+  const [lastPage, setLastPage] = useState(1);
+
+  const [selectedlibrary, setSelectedlibrary] = useState(null);
 
   useEffect(() => {
-    fetch("/api/books/pages/" + inventoryPage, {
+    const getQuery = selectedlibrary
+      ? "/api/libraries/books/pages/"
+      : "/api/books/pages/";
+    fetch(getQuery + inventoryPage, {
       method: "GET",
     })
       .then((res) => {
@@ -31,7 +36,7 @@ export const InventoryProvider = ({ children }) => {
       setStatus("loading");
       setNewBook(false);
     };
-  }, [newBook, inventoryPage]);
+  }, [newBook, inventoryPage, selectedlibrary]);
 
   return (
     <InventoryContext.Provider
@@ -42,6 +47,8 @@ export const InventoryProvider = ({ children }) => {
         page: inventoryPage,
         setPage: setInventoryPage,
         lastPage,
+        selectedlibrary,
+        setSelectedlibrary,
       }}
     >
       {children}

@@ -10,11 +10,12 @@ function BookCard({
   year,
   language,
   country,
+  //stock,
 }) {
   return (
     <BookDiv>
       <div>
-        Title: <span>{title}</span>
+        <span>{title}</span>
       </div>
       <BookImg src={imgSrc} />
       <InfoContainer>
@@ -23,6 +24,7 @@ function BookCard({
         <div>Language: {language}</div>
         <div>Year: {year}</div>
         <div>Pages: {pages}</div>
+        {/* <div>Stock: {stock}</div> */}
       </InfoContainer>
       {link && <a href={link}>More info</a>}
       <ButtonContainer>
@@ -37,7 +39,7 @@ const BookDiv = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
   border: 1px solid gray;
   margin: 10px;

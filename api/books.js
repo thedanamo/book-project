@@ -1,7 +1,7 @@
 const { query } = require("express");
 const express = require("express");
 const router = express.Router();
-const queries = require("../db/queries");
+const queries = require("../db/bookQueries");
 
 // Middleware to validate that given id is a number
 const isIdNumber = (req, res, next) => {
@@ -36,11 +36,6 @@ router.get("/", (req, res) => {
 router.post("/", (req, res, next) => {
   const givenBook = req.body;
   if (isValidBook(givenBook)) {
-    // Set default stock to 5 if no stock given
-    if (!givenBook.stock) {
-      givenBook["stock"] = 5;
-    }
-
     queries.create(givenBook).then((books) => {
       res.status(201).json(books[0]);
     });
@@ -93,17 +88,17 @@ router.delete("/:id", (req, res, next) => {
 });
 
 // Endpoint to return books with pages information, 16 per page
-router.get("/pages/:page", (req, res) => {
+router.get("/pages/:page", async (req, res) => {
   let { page } = req.params;
   const pagination = {};
   const per_page = 16;
   page = !page || page < 1 ? 1 : page;
   const offset = (page - 1) * per_page;
 
-  return Promise.all([
-    queries.getCount(),
-    queries.getPage(offset, per_page),
-  ]).then(([total, rows]) => {
+  try {
+    const total = await queries.getCount();
+    const rows = await queries.getPage(offset, per_page);
+
     const count = total.count;
     pagination.total = count;
     pagination.last_page = Math.ceil(count / per_page);
@@ -119,7 +114,10 @@ router.get("/pages/:page", (req, res) => {
       res.status(404);
       next(new Error("Error getting books."));
     }
-  });
+  } catch (error) {
+    res.status(404);
+    next(new Error(error.message));
+  }
 });
 
 module.exports = router;
