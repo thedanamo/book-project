@@ -88,16 +88,16 @@ router.delete("/:id", (req, res, next) => {
 });
 
 // Endpoint to return books with pages information, 16 per page
-router.get("/pages/:page", async (req, res) => {
+router.get("/pages/:page", async (req, res, next) => {
   let { page } = req.params;
+  const { library } = req.query;
   const pagination = {};
   const per_page = 16;
   page = !page || page < 1 ? 1 : page;
   const offset = (page - 1) * per_page;
 
   try {
-    const total = await queries.getCount();
-    const rows = await queries.getPage(offset, per_page);
+    const { total, rows } = await queries.getPage(offset, per_page, library);
 
     const count = total.count;
     pagination.total = count;

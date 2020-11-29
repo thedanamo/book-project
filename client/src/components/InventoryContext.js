@@ -12,10 +12,8 @@ export const InventoryProvider = ({ children }) => {
   const [selectedlibrary, setSelectedlibrary] = useState(null);
 
   useEffect(() => {
-    const getQuery = selectedlibrary
-      ? "/api/libraries/books/pages/"
-      : "/api/books/pages/";
-    fetch(getQuery + inventoryPage, {
+    const query = selectedlibrary ? "?library=" + selectedlibrary : "";
+    fetch("/api/books/pages/" + inventoryPage + query, {
       method: "GET",
     })
       .then((res) => {
