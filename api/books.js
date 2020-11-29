@@ -1,3 +1,4 @@
+const { query } = require("express");
 const express = require("express");
 const router = express.Router();
 const queries = require("../db/queries");
@@ -87,6 +88,36 @@ router.delete("/:id", (req, res, next) => {
     } else {
       res.status(404);
       next(new Error("No books in database"));
+    }
+  });
+});
+
+// Endpoint to return books with pages information, 16 per page
+router.get("/pages/:page", (req, res) => {
+  let { page } = req.params;
+  const pagination = {};
+  const per_page = 16;
+  page = !page || page < 1 ? 1 : page;
+  const offset = (page - 1) * per_page;
+
+  return Promise.all([
+    queries.getCount(),
+    queries.getPage(offset, per_page),
+  ]).then(([total, rows]) => {
+    const count = total.count;
+    pagination.total = count;
+    pagination.last_page = Math.ceil(count / per_page);
+    pagination.data = rows;
+
+    if (pagination.data && pagination.total && pagination.last_page) {
+      res.json({
+        books: pagination.data,
+        last_page: pagination.last_page,
+        total_count: pagination.total,
+      });
+    } else {
+      res.status(404);
+      next(new Error("Error getting books."));
     }
   });
 });

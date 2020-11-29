@@ -24,4 +24,16 @@ module.exports = {
   delete(id) {
     return knex("books").where("id", id).delete("*");
   },
+
+  getCount() {
+    return knex("books").count("* as count").from("books").first();
+  },
+
+  getPage(offset, per_page) {
+    return knex("books")
+      .select("*")
+      .from("books")
+      .offset(offset)
+      .limit(per_page);
+  },
 };
