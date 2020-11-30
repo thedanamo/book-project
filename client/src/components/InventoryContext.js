@@ -85,7 +85,7 @@ export const InventoryProvider = ({ children }) => {
         const res = await fetch(query, {
           method: "DELETE",
           headers: {
-            Authorization: "Bearer " + token, // from local storage
+            Authorization: "Bearer " + token,
           },
         });
 
@@ -196,7 +196,7 @@ export const InventoryProvider = ({ children }) => {
           {
             method: "PUT",
             headers: {
-              Authorization: "Bearer " + token, // from local storage
+              Authorization: "Bearer " + token,
             },
           }
         );

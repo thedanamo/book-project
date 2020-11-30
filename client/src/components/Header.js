@@ -17,7 +17,7 @@ const Header = () => {
 
   return (
     <StyledHeader>
-      {!user && (
+      {!user ? (
         <LoginSection>
           <LoginContainer>
             Username:{" "}
@@ -34,7 +34,7 @@ const Header = () => {
                 setLoginInfo({ ...loginInfo, password: e.target.value });
               }}
               type="text"
-              placeholder="Username"
+              placeholder="Password"
             />
           </LoginContainer>
           <StyledButton
@@ -46,6 +46,8 @@ const Header = () => {
             Login
           </StyledButton>
         </LoginSection>
+      ) : (
+        <h4>{user.username}</h4>
       )}
       <StyledLogo src={logo} className="App-logo" alt="logo" />
       <div></div>

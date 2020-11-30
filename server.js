@@ -22,8 +22,6 @@ app.use(express.static("assets"));
 const verifyToken = (req, res, next) => {
   if (req.path == "/api/auth/login" || req.path == "/") return next();
 
-  //authenticate user
-
   // Get auth header value
   const bearerHeader = req.headers["authorization"];
   if (bearerHeader) {
@@ -40,8 +38,6 @@ app.all("*", verifyToken);
 
 // Auth api
 app.use("/api/auth", auth);
-
-// ADD MIDDLWARE TO CHECK IF USER LOGGED IN
 
 // Book api
 app.use("/api/books", books);

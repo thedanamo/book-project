@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }) => {
           return res.json();
         })
         .then((user) => {
-          console.log("***** LOGGING IN", user);
           localStorage.setItem("userBPToken", user.token);
           user.username && setUser(user);
         })

@@ -5,17 +5,6 @@ const jwt = require("jsonwebtoken");
 
 // TODO: use BCRYPT
 
-// format of token
-
-const verifyToken = (req, res, next) => {
-  // Get auth header value
-  const bearerHeader = req.headers["authorization"];
-  if (typeof bearerHeader !== undefined) {
-  } else {
-    res.status(403);
-  }
-};
-
 // Checks if user object has required username, password, and name
 const isValidUser = (user) => {
   const hasUsername =
@@ -54,24 +43,22 @@ router.post("/login", (req, res, next) => {
   }
 });
 
-// Endpoint to create user
-// router.post("/", (req, res, next) => {
-//   const newUser = req.body;
-//   if (isValidUser(newUser)) {
-//     queries.create(newUser).then((users) => {
-//       res.status(201).json(users[0]);
-//     });
-//   } else {
-//     res.status(400);
-//     next(new Error("Invalid user object"));
-//   }
-// });
+//Endpoint to create user
+router.post("/", (req, res, next) => {
+  const newUser = req.body;
+  if (isValidUser(newUser)) {
+    queries.create(newUser).then((users) => {
+      res.status(201).json(users[0]);
+    });
+  } else {
+    res.status(400);
+    next(new Error("Invalid user object"));
+  }
+});
 
 // Endpoint to return a user by given username
 router.get("/:username", (req, res, next) => {
   const { username } = req.params;
-
-  // TODO: Validate correct password is given will go here || add middleware?
 
   queries.get(username).then((user) => {
     if (user) {
@@ -87,8 +74,6 @@ router.get("/:username", (req, res, next) => {
 router.put("/:username", (req, res, next) => {
   const { username } = req.params;
   const user = req.body;
-
-  // TODO: Validate this user is logged in
 
   if (isValidUser(user)) {
     queries.update(username, user).then((users) => {
