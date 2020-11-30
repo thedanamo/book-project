@@ -3,6 +3,25 @@ const express = require("express");
 const router = express.Router();
 const queries = require("../db/bookQueries");
 
+let newEmptyStockBooks = [];
+
+// Finds and adds book to newEmptyStockBooks list
+const addEmptyBookToList = (id) => {
+  queries.getBook(id).then((book) => {
+    if (book) {
+      newEmptyStockBooks.push(book);
+    } else {
+      console.log(new Error("Book with id " + id + " not found"));
+    }
+  });
+};
+
+// Interval to notify users of recent books that went out of stock
+setInterval(async () => {
+  console.log(newEmptyStockBooks);
+  newEmptyStockBooks = []; // Reset it to empty since we only want to notify about books that just went to 0 stock
+}, 6000);
+
 // Middleware to validate that given id is a number
 const isIdNumber = (req, res, next) => {
   if (isNaN(req.params.id)) {
@@ -45,7 +64,7 @@ router.post("/", (req, res, next) => {
   }
 });
 
-// Endpoint to add book to db
+// Endpoint to add book to library
 router.post("/add", (req, res, next) => {
   const { id, stock } = req.body;
   const { libraryId } = req.query;
@@ -83,6 +102,10 @@ router.put("/:id", (req, res, next) => {
   if (isValidBook(updateBook)) {
     queries.update(id, updateBook, libraryId).then((books) => {
       res.json(books[0]);
+
+      if (books[0].stock === 0) {
+        addEmptyBookToList(id);
+      }
     });
   } else {
     res.status(400);
@@ -115,13 +138,14 @@ router.delete("/:id", (req, res, next) => {
   }
 });
 
-// Endpoint to find and increment stock of book with given id
+// Endpoint to increment stock of book with given id
 router.put("/increment/:id", (req, res, next) => {
   const { id } = req.params;
   const { libraryId } = req.query;
   try {
     queries.increment(id, libraryId).then((library_books) => {
-      res.json(library_books);
+      res.json(library_books[0]);
+      console.log(library_books[0]);
     });
   } catch (err) {
     res.status(400);
@@ -129,13 +153,17 @@ router.put("/increment/:id", (req, res, next) => {
   }
 });
 
-// Endpoint to find and decrement stock of book with given id
+// Endpoint to decrement stock of book with given id
 router.put("/decrement/:id", (req, res, next) => {
   const { id } = req.params;
   const { libraryId } = req.query;
   try {
     queries.decrement(id, libraryId).then((library_books) => {
-      res.json(library_books);
+      res.json(library_books[0]);
+
+      if (library_books[0].stock === 0) {
+        addEmptyBookToList(id);
+      }
     });
   } catch (err) {
     res.status(400);

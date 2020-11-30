@@ -25,6 +25,11 @@ module.exports = {
     return knex("books").where("id", id).first();
   },
 
+  async getEmptyStockLibraryBooks() {
+    const res = await knex("library_book_references").where({ stock: 0 });
+    return res;
+  },
+
   // Update book by given id
   update(id, book, libraryId) {
     let query = libraryId
@@ -49,15 +54,23 @@ module.exports = {
   // Increment book stock by given book id and library id
   increment(id, libraryId) {
     return knex("library_book_references")
-      .increment("stock")
-      .where({ library_id: libraryId, book_id: id });
+      .where({ library_id: libraryId, book_id: id })
+      .update({ stock: knex.raw("stock + 1") }, [
+        "library_id",
+        "book_id",
+        "stock",
+      ]);
   },
 
   // Decrement book stock by given book id and library id
   decrement(id, libraryId) {
     return knex("library_book_references")
-      .decrement("stock")
-      .where({ library_id: libraryId, book_id: id });
+      .where({ library_id: libraryId, book_id: id })
+      .update({ stock: knex.raw("stock - 1") }, [
+        "library_id",
+        "book_id",
+        "stock",
+      ]);
   },
 
   // Get all books or books per library with pagination
