@@ -10,6 +10,9 @@ https://github.com/benoitvallon/100-best-books
 
 # Description
 
+- LOGIN with
+  username: admin
+  password: vention9001
 - The app starts off with a view of the main book repo (viewing all books).
 - You must choose a library to view the books specific to that library and their stock.
 - Incrementing or Decrementing a books stock when viewing a libraries books can be done with the "+" or "-" buttons.
@@ -23,3 +26,6 @@ https://github.com/benoitvallon/100-best-books
 
 - Run the Migrations and then Seeds
 - To start you must run "yarn dev" in terminal from the main project folder and then "yarn start" from the client folder.
+- LOGIN with
+  username: admin
+  password: vention9001
