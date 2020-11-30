@@ -179,7 +179,7 @@ function BookCard({
         )}
         {editMode && (
           <StyledButton
-            variant="primary"
+            variant="success"
             onClick={() => {
               submitEditBook();
             }}

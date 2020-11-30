@@ -45,6 +45,21 @@ router.post("/", (req, res, next) => {
   }
 });
 
+// Endpoint to add book to db
+router.post("/add", (req, res, next) => {
+  const { id, stock } = req.body;
+  const { libraryId } = req.query;
+  if (id && libraryId) {
+    stock = stock ? stock : 1;
+    queries.addBookToLibrary({ id, stock }, libraryId).then((library_books) => {
+      res.status(201).json(library_books[0]);
+    });
+  } else {
+    res.status(400);
+    next(new Error("Invalid book info"));
+  }
+});
+
 // Endpoint to return a book by given id
 router.get("/:id", (req, res, next) => {
   const { id } = req.params;

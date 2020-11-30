@@ -11,6 +11,15 @@ module.exports = {
     return knex("books").insert(book, "*");
   },
 
+  // Add book to library
+  addBookToLibrary(bookInfo, libraryId) {
+    const { book_id, stock } = bookInfo;
+    return knex("library_book_references").insert(
+      { book_id, stock, library_id: libraryId },
+      "*"
+    );
+  },
+
   // Return book by given id
   getBook(id) {
     return knex("books").where("id", id).first();

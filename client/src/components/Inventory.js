@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import { InventoryContext } from "./InventoryContext";
 import BookCard from "./BookCard";
 import Paginator from "./Paginator";
 import Loading from "./Loading";
+import AddBook from "./AddBook";
 import Button from "react-bootstrap/Button";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -12,7 +13,6 @@ function Inventory() {
   const {
     status,
     allBooks,
-    setNewBook,
     page,
     setPage,
     lastPage,
@@ -21,7 +21,12 @@ function Inventory() {
     setStockIncDec,
     setDeleteBook,
     setEditBook,
+    addBook,
+    setAddBook,
   } = useContext(InventoryContext);
+
+  const [addMode, setAddMode] = useState(false);
+  const [addBookInfo, setAddBookInfo] = useState(null);
 
   return (
     <div>
@@ -35,7 +40,7 @@ function Inventory() {
             setPage(1);
           }}
         >
-          <Dropdown.Item eventKey="">All Books</Dropdown.Item>
+          <Dropdown.Item eventKey="">All Books (Book Repo)</Dropdown.Item>
           {/* map through libraries */}
           <Dropdown.Item eventKey="1">St.Do Brary</Dropdown.Item>
           <Dropdown.Item eventKey="2">Westmount</Dropdown.Item>
@@ -49,7 +54,30 @@ function Inventory() {
       {status === "error" && "Error..."}
       {status === "success" && (
         <InventoryContainer>
-          <StyledButton variant="primary">Add book</StyledButton>
+          {!selectedlibrary && (
+            <div>
+              {" "}
+              <StyledButton
+                variant="primary"
+                onClick={() => {
+                  setAddMode(!addMode);
+                }}
+              >
+                {addMode ? "Close" : "Add book"}
+              </StyledButton>
+              {addMode && (
+                <AddBook
+                  addMode={addMode}
+                  addBookInfo={addBookInfo}
+                  setAddBookInfo={setAddBookInfo}
+                  addBook={addBook}
+                  setAddBook={setAddBook}
+                  setAddMode={setAddMode}
+                />
+              )}
+            </div>
+          )}
+
           <Paginator active={page} lastPage={lastPage} setPage={setPage} />
           <Grid>
             {allBooks.map((book) => {

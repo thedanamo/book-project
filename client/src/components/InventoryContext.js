@@ -6,7 +6,8 @@ export const InventoryProvider = ({ children }) => {
   const [allBooks, setAllBooks] = useState([]);
   const [status, setStatus] = useState("loading");
   const [inventoryPage, setInventoryPage] = useState(1);
-  const [newBook, setNewBook] = useState(false); // Will be used to update list when new book added
+  const [addBook, setAddBook] = useState(null);
+  const [addedBook, setAddedBook] = useState(false); // Will be used to update list when new book added
   const [lastPage, setLastPage] = useState(1);
   const [selectedlibrary, setSelectedlibrary] = useState(null);
   const [stockIncDec, setStockIncDec] = useState(null);
@@ -14,6 +15,7 @@ export const InventoryProvider = ({ children }) => {
   const [deletedBook, setDeletedBook] = useState(false);
   const [editBook, setEditBook] = useState(null);
 
+  // Set All books by page and library useEffect
   useEffect(() => {
     const query = selectedlibrary ? "?library=" + selectedlibrary : "";
     fetch("/api/books/pages/" + inventoryPage + query, {
@@ -35,11 +37,12 @@ export const InventoryProvider = ({ children }) => {
 
     return () => {
       setStatus("loading");
-      setNewBook(false);
       setDeletedBook(false);
+      setAddedBook(false);
     };
-  }, [newBook, inventoryPage, selectedlibrary, deletedBook]);
+  }, [inventoryPage, selectedlibrary, deletedBook, addedBook]);
 
+  // Delete Book useEffect
   useEffect(() => {
     const awaitFetch = async () => {
       try {
@@ -51,7 +54,7 @@ export const InventoryProvider = ({ children }) => {
           : "/api/books/" + deleteBook.bookId;
 
         const res = await fetch(query, {
-          method: "Delete",
+          method: "DELETE",
         });
 
         const data = await res.json();
@@ -72,6 +75,40 @@ export const InventoryProvider = ({ children }) => {
     };
   }, [deleteBook]);
 
+  // Add Book useEffect
+  useEffect(() => {
+    const awaitFetch = async () => {
+      try {
+        let query = "/api/books";
+
+        const res = await fetch(query, {
+          method: "POST",
+          body: JSON.stringify({ ...addBook }),
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await res.json();
+        console.log(addBook, data);
+        setAddedBook(true);
+      } catch (err) {
+        setStatus("error");
+        console.log(err);
+      }
+    };
+
+    if (addBook) {
+      awaitFetch();
+    }
+
+    return () => {
+      setAddBook(null);
+    };
+  }, [addBook]);
+
+  // Edit Book useEffect
   useEffect(() => {
     const awaitFetch = async () => {
       try {
@@ -104,10 +141,11 @@ export const InventoryProvider = ({ children }) => {
     }
 
     return () => {
-      setStockIncDec(null);
+      setEditBook(null);
     };
   }, [editBook]);
 
+  // Book Stock Inc/Dec useEffect
   useEffect(() => {
     const awaitFetch = async () => {
       try {
@@ -145,7 +183,6 @@ export const InventoryProvider = ({ children }) => {
       value={{
         allBooks,
         status,
-        setNewBook,
         page: inventoryPage,
         setPage: setInventoryPage,
         lastPage,
@@ -154,6 +191,8 @@ export const InventoryProvider = ({ children }) => {
         setStockIncDec,
         setDeleteBook,
         setEditBook,
+        addBook,
+        setAddBook,
       }}
     >
       {children}
