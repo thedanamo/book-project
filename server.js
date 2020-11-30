@@ -14,6 +14,8 @@ app.use(express.static("assets"));
 // Auth api
 app.use("/api/auth", auth);
 
+// ADD MIDDLWARE TO CHECK IF USER LOGGED IN
+
 // Book api
 app.use("/api/books", books);
 
@@ -31,6 +33,7 @@ app.use((err, req, res, next) => {
     message: err.message,
     error: req.app.get("env") === "development" ? err : {},
   });
+  console.log("ERROR: ", err.status, err.message);
 });
 
 // Listen on port 9001

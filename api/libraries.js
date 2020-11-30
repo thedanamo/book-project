@@ -1,4 +1,3 @@
-const { query } = require("express");
 const express = require("express");
 const router = express.Router();
 const queries = require("../db/libraryQueries");
@@ -39,7 +38,6 @@ router.get("/:id", (req, res, next) => {
   });
 });
 
-// TODO: **************************************************************** */
 // Endpoint to return libraries with pages information, 16 per page
 router.get("/pages/:page", async (req, res, next) => {
   let { page } = req.params;
