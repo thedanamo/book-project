@@ -9,7 +9,7 @@ exports.up = function (knex) {
     table.integer("pages");
     table.string("title").notNullable();
     table.integer("year");
-    table.integer("stock").defaultTo(5); // Setting default if null for testing
+    table.integer("stock"); // Setting default if null for testing
   });
 };
 
