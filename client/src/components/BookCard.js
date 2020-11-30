@@ -45,6 +45,7 @@ function BookCard({
 
   const submitEditBook = () => {
     console.log("*******", stockNumber);
+    setEditMode(false);
     setEditBook(
       isBookRepoEditMode
         ? { book: { ...editBookInfo }, bookId: id, libraryId }
@@ -54,7 +55,6 @@ function BookCard({
             libraryId,
           }
     );
-    setEditMode(false);
   };
 
   const isBookRepoEditMode = editMode && !libraryId;
@@ -137,7 +137,7 @@ function BookCard({
             />
           )}
         </div>
-        {stock && (
+        {(stock || stock === 0) && (
           <>
             <div>
               Stock:
@@ -155,26 +155,28 @@ function BookCard({
                 stockNumber
               )}
             </div>
-            <ButtonContainer>
-              {stockNumber > 0 && (
+            {!editMode && (
+              <ButtonContainer>
+                {stockNumber > 0 && (
+                  <StyledButton
+                    variant="primary"
+                    onClick={() => {
+                      incrementOrDecrement("decrement");
+                    }}
+                  >
+                    -
+                  </StyledButton>
+                )}
                 <StyledButton
                   variant="primary"
                   onClick={() => {
-                    incrementOrDecrement("decrement");
+                    incrementOrDecrement("increment");
                   }}
                 >
-                  -
+                  +
                 </StyledButton>
-              )}
-              <StyledButton
-                variant="primary"
-                onClick={() => {
-                  incrementOrDecrement("increment");
-                }}
-              >
-                +
-              </StyledButton>
-            </ButtonContainer>
+              </ButtonContainer>
+            )}
           </>
         )}
         {editMode && (
@@ -182,6 +184,7 @@ function BookCard({
             variant="success"
             onClick={() => {
               submitEditBook();
+              setEditButtonText(!editMode ? "Close" : "Edit");
             }}
           >
             Submit
@@ -193,8 +196,8 @@ function BookCard({
         <StyledButton
           variant="primary"
           onClick={() => {
-            setEditButtonText(!editMode ? "Close" : "Edit");
             setEditMode(!editMode);
+            setEditButtonText(!editMode ? "Close" : "Edit");
           }}
         >
           {editButtonText}
