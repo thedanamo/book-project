@@ -7,7 +7,7 @@ function BookCard({
   libraryId,
   title,
   author,
-  imgSrc,
+  imageLink,
   link,
   pages,
   year,
@@ -15,8 +15,22 @@ function BookCard({
   country,
   stock,
   setStockIncDec,
+  setDeleteBook,
+  setEditBook,
 }) {
   const [stockNumber, setStockNumber] = useState(stock);
+  const [editButtonText, setEditButtonText] = useState("Edit");
+  const [editMode, setEditMode] = useState(false);
+  const [editBookInfo, setEditBookInfo] = useState({
+    title,
+    author,
+    imageLink,
+    link,
+    pages,
+    year,
+    language,
+    country,
+  });
 
   const incrementOrDecrement = (mode) => {
     setStockIncDec({ bookId: id, libraryId, mode });
@@ -25,30 +39,133 @@ function BookCard({
     setStockNumber(mode === "increment" ? stockNumber + 1 : stockNumber - 1);
   };
 
+  const deleteBook = () => {
+    setDeleteBook({ bookId: id, libraryId });
+  };
+
+  const submitEditBook = () => {
+    console.log("*******", stockNumber);
+    setEditBook(
+      isBookRepoEditMode
+        ? { book: { ...editBookInfo }, bookId: id, libraryId }
+        : {
+            book: { ...editBookInfo, stock: stockNumber },
+            bookId: id,
+            libraryId,
+          }
+    );
+    setEditMode(false);
+  };
+
+  const isBookRepoEditMode = editMode && !libraryId;
+  const isLibraryEditMode = editMode && libraryId;
+
   return (
     <BookDiv>
       <div>
         <span>{title}</span>
       </div>
-      {imgSrc && <BookImg src={imgSrc} />}
+      {imageLink && <BookImg src={imageLink} />}
       <InfoContainer>
-        <div> Author: {author}</div>
-        <div> Country: {country}</div>
-        <div>Language: {language}</div>
-        <div>Year: {year}</div>
-        <div>Pages: {pages}</div>
+        <div>
+          Author:
+          {!isBookRepoEditMode ? (
+            editBookInfo.author
+          ) : (
+            <input
+              onChange={(e) => {
+                setEditBookInfo({ ...editBookInfo, author: e.target.value });
+              }}
+              type="text"
+              placeholder={editBookInfo.author}
+            />
+          )}
+        </div>
+        <div>
+          Country:
+          {!isBookRepoEditMode ? (
+            editBookInfo.country
+          ) : (
+            <input
+              onChange={(e) => {
+                setEditBookInfo({ ...editBookInfo, country: e.target.value });
+              }}
+              type="text"
+              placeholder={editBookInfo.country}
+            />
+          )}
+        </div>
+        <div>
+          Language:
+          {!isBookRepoEditMode ? (
+            editBookInfo.language
+          ) : (
+            <input
+              onChange={(e) => {
+                setEditBookInfo({ ...editBookInfo, language: e.target.value });
+              }}
+              type="text"
+              placeholder={editBookInfo.language}
+            />
+          )}
+        </div>
+        <div>
+          Year:
+          {!isBookRepoEditMode ? (
+            editBookInfo.year
+          ) : (
+            <input
+              onChange={(e) => {
+                setEditBookInfo({ ...editBookInfo, year: e.target.value });
+              }}
+              type="text"
+              placeholder={editBookInfo.year}
+            />
+          )}
+        </div>
+        <div>
+          Pages:
+          {!isBookRepoEditMode ? (
+            editBookInfo.pages
+          ) : (
+            <input
+              onChange={(e) => {
+                setEditBookInfo({ ...editBookInfo, pages: e.target.value });
+              }}
+              type="text"
+              placeholder={editBookInfo.pages}
+            />
+          )}
+        </div>
         {stock && (
           <>
-            <div>Stock: {stockNumber}</div>
+            <div>
+              Stock:
+              {isLibraryEditMode ? (
+                <input
+                  onChange={(e) => {
+                    console.log("**TEARGET: ", e.target.value);
+                    setStockNumber(Number(e.target.value));
+                  }}
+                  type="number"
+                  min="0"
+                  placeholder={stockNumber}
+                />
+              ) : (
+                stockNumber
+              )}
+            </div>
             <ButtonContainer>
-              <StyledButton
-                variant="primary"
-                onClick={() => {
-                  incrementOrDecrement("decrement");
-                }}
-              >
-                -
-              </StyledButton>
+              {stockNumber > 0 && (
+                <StyledButton
+                  variant="primary"
+                  onClick={() => {
+                    incrementOrDecrement("decrement");
+                  }}
+                >
+                  -
+                </StyledButton>
+              )}
               <StyledButton
                 variant="primary"
                 onClick={() => {
@@ -60,13 +177,34 @@ function BookCard({
             </ButtonContainer>
           </>
         )}
+        {editMode && (
+          <StyledButton
+            variant="primary"
+            onClick={() => {
+              submitEditBook();
+            }}
+          >
+            Submit
+          </StyledButton>
+        )}
       </InfoContainer>
       {link && <a href={link}>More info</a>}
       <ButtonContainer>
-        <StyledButton variant="primary" onClick={() => {}}>
-          Edit
+        <StyledButton
+          variant="primary"
+          onClick={() => {
+            setEditButtonText(!editMode ? "Close" : "Edit");
+            setEditMode(!editMode);
+          }}
+        >
+          {editButtonText}
         </StyledButton>
-        <StyledButton variant="danger" onClick={() => {}}>
+        <StyledButton
+          variant="danger"
+          onClick={() => {
+            deleteBook();
+          }}
+        >
           Delete
         </StyledButton>
       </ButtonContainer>

@@ -19,6 +19,8 @@ function Inventory() {
     selectedlibrary,
     setSelectedlibrary,
     setStockIncDec,
+    setDeleteBook,
+    setEditBook,
   } = useContext(InventoryContext);
 
   return (
@@ -33,7 +35,7 @@ function Inventory() {
             setPage(1);
           }}
         >
-          <Dropdown.Item eventKey="">All</Dropdown.Item>
+          <Dropdown.Item eventKey="">All Books</Dropdown.Item>
           {/* map through libraries */}
           <Dropdown.Item eventKey="1">St.Do Brary</Dropdown.Item>
           <Dropdown.Item eventKey="2">Westmount</Dropdown.Item>
@@ -71,7 +73,7 @@ function Inventory() {
                   libraryId={selectedlibrary}
                   title={title}
                   author={author}
-                  imgSrc={imageLink}
+                  imageLink={imageLink}
                   link={link}
                   language={language}
                   pages={pages}
@@ -79,6 +81,8 @@ function Inventory() {
                   year={year}
                   stock={stock}
                   setStockIncDec={setStockIncDec}
+                  setDeleteBook={setDeleteBook}
+                  setEditBook={setEditBook}
                 />
               );
             })}

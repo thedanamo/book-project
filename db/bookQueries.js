@@ -17,12 +17,24 @@ module.exports = {
   },
 
   // Update book by given id
-  update(id, book) {
-    return knex("books").where("id", id).update(book, "*");
+  update(id, book, libraryId) {
+    let query = libraryId
+      ? knex("library_book_references")
+          .where({ library_id: libraryId, book_id: id })
+          .update({ stock: book.stock }, "*")
+      : knex("books").where("id", id).update(book, "*");
+
+    return query;
   },
 
-  delete(id) {
-    return knex("books").where("id", id).delete("*");
+  delete(id, libraryId) {
+    let query = libraryId
+      ? knex("library_book_references")
+          .where({ library_id: libraryId, book_id: id })
+          .delete("*") // delete book from library
+      : knex("books").where("id", id).delete("*"); //delete book in book repo
+
+    return query;
   },
 
   // Increment book stock by given book id and library id
@@ -58,7 +70,7 @@ module.exports = {
       .count()
 
       .first();
-    const rows = await query.offset(offset).limit(per_page);
+    const rows = await query.orderBy("books.id").offset(offset).limit(per_page);
 
     return { rows, total };
   },

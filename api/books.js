@@ -62,9 +62,11 @@ router.get("/:id", (req, res, next) => {
 // Endpoint to find and update book with given id in the db
 router.put("/:id", (req, res, next) => {
   const { id } = req.params;
+  const { libraryId } = req.query;
   const updateBook = req.body;
+  console.log("****", updateBook);
   if (isValidBook(updateBook)) {
-    queries.update(id, updateBook).then((books) => {
+    queries.update(id, updateBook, libraryId).then((books) => {
       res.json(books[0]);
     });
   } else {
@@ -76,15 +78,26 @@ router.put("/:id", (req, res, next) => {
 // Endpoint to delete book with given id
 router.delete("/:id", (req, res, next) => {
   const { id } = req.params;
-
-  queries.delete(id).then((books) => {
-    if (books) {
-      res.json(books);
-    } else {
-      res.status(404);
-      next(new Error("No books in database"));
-    }
-  });
+  const { libraryId } = req.query;
+  if (libraryId) {
+    queries.delete(id, libraryId).then((library_books) => {
+      if (library_books) {
+        res.json(library_books);
+      } else {
+        res.status(404);
+        next(new Error("Error deleting book from library"));
+      }
+    });
+  } else {
+    queries.delete(id).then((books) => {
+      if (books) {
+        res.json(books);
+      } else {
+        res.status(404);
+        next(new Error("No books in database"));
+      }
+    });
+  }
 });
 
 // Endpoint to find and increment stock of book with given id
