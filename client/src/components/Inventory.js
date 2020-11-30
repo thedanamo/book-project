@@ -23,6 +23,7 @@ function Inventory() {
     setEditBook,
     addBook,
     setAddBook,
+    notifications,
   } = useContext(InventoryContext);
 
   const [addMode, setAddMode] = useState(false);
@@ -46,7 +47,13 @@ function Inventory() {
           <Dropdown.Item eventKey="2">Westmount</Dropdown.Item>
           <Dropdown.Item eventKey="3">Concordia LB</Dropdown.Item>
         </StyledDropDown>
-        <NotificationContainer>Notifications here</NotificationContainer>
+        <h4>Notifications</h4>
+        <NotificationContainer>
+          {notifications.map((book) => {
+            console.log(book.title);
+            return <div>{book.title}</div>;
+          })}
+        </NotificationContainer>
       </InventoryContainer>
       <h2>Book List</h2>
 
@@ -137,11 +144,11 @@ const InventoryContainer = styled.div`
 `;
 
 const NotificationContainer = styled.div`
-  display: flex;
+  overflow: auto;
   border: 1px solid black;
   margin: 10px;
   height: 150px;
-  max-height: 150px;
+  max-height: 120px;
   width: 400px;
 `;
 

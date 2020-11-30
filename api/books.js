@@ -1,26 +1,25 @@
-const { query } = require("express");
 const express = require("express");
 const router = express.Router();
 const queries = require("../db/bookQueries");
 
-let newEmptyStockBooks = [];
+const emptyArrayAccess = () => {
+  let newEmptyStockBooks = [];
+
+  return { newEmptyStockBooks };
+};
+
+const emptyBooks = emptyArrayAccess();
 
 // Finds and adds book to newEmptyStockBooks list
 const addEmptyBookToList = (id) => {
   queries.getBook(id).then((book) => {
     if (book) {
-      newEmptyStockBooks.push(book);
+      emptyBooks.newEmptyStockBooks.push(book);
     } else {
       console.log(new Error("Book with id " + id + " not found"));
     }
   });
 };
-
-// Interval to notify users of recent books that went out of stock
-setInterval(async () => {
-  console.log(newEmptyStockBooks);
-  newEmptyStockBooks = []; // Reset it to empty since we only want to notify about books that just went to 0 stock
-}, 6000);
 
 // Middleware to validate that given id is a number
 const isIdNumber = (req, res, next) => {
@@ -98,7 +97,7 @@ router.put("/:id", (req, res, next) => {
   const { id } = req.params;
   const { libraryId } = req.query;
   const updateBook = req.body;
-  console.log("****", updateBook);
+
   if (isValidBook(updateBook)) {
     queries.update(id, updateBook, libraryId).then((books) => {
       res.json(books[0]);
@@ -204,4 +203,4 @@ router.get("/pages/:page", async (req, res, next) => {
   }
 });
 
-module.exports = router;
+module.exports = { router, emptyBooks };

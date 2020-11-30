@@ -44,7 +44,6 @@ function BookCard({
   };
 
   const submitEditBook = () => {
-    console.log("*******", stockNumber);
     setEditMode(false);
     setEditBook(
       isBookRepoEditMode
@@ -144,7 +143,6 @@ function BookCard({
               {isLibraryEditMode ? (
                 <input
                   onChange={(e) => {
-                    console.log("**TEARGET: ", e.target.value);
                     setStockNumber(Number(e.target.value));
                   }}
                   type="number"

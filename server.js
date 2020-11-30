@@ -2,15 +2,23 @@ const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const auth = require("./api/auth");
-const books = require("./api/books");
+let { router: books, emptyBooks } = require("./api/books");
 
 const port = process.env.PORT || 9001;
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
+  cors: true,
+  origins: ["*"],
+});
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static("assets"));
+
 // Auth api
 app.use("/api/auth", auth);
 
@@ -36,7 +44,24 @@ app.use((err, req, res, next) => {
   console.log("ERROR: ", err.status, err.message);
 });
 
+io.on("connection", (socket) => {
+  console.log("a user connected");
+
+  socket.on("disconnect", (reason) => {
+    console.log("user disconnected");
+  });
+});
+
+// 1 Minute Interval to notify users of recent books that went out of stock
+setInterval(async () => {
+  if (emptyBooks.newEmptyStockBooks.length > 0) {
+    await io.emit("receive empty notifications", emptyBooks.newEmptyStockBooks);
+    // Reset it to empty since we only want to notify about books that just went to 0 stock
+    emptyBooks.newEmptyStockBooks = [];
+  }
+}, 60000);
+
 // Listen on port 9001
-app.listen(port, () => console.log(`listening on port: ${port}`));
+server.listen(port, () => console.log(`listening on port: ${port}`));
 
 module.exports = app;

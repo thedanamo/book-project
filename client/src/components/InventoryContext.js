@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 
+const io = require("socket.io-client");
+const socket = io("http://localhost:9001");
+
 export const InventoryContext = React.createContext(null);
 
 export const InventoryProvider = ({ children }) => {
@@ -14,6 +17,26 @@ export const InventoryProvider = ({ children }) => {
   const [deleteBook, setDeleteBook] = useState(null);
   const [deletedBook, setDeletedBook] = useState(false);
   const [editBook, setEditBook] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    socket.on("receive empty notifications", (payload) => {
+      setNotifications((previousNotifications) => {
+        return previousNotifications.length <= 40
+          ? [...payload, ...previousNotifications]
+          : [
+              ...payload,
+              ...previousNotifications.splice(
+                30,
+                previousNotifications.length - 90
+              ),
+            ];
+      });
+    });
+    return () => {
+      socket.removeListener("receive empty notifications");
+    };
+  }, []);
 
   // Set All books by page and library useEffect
   useEffect(() => {
@@ -193,6 +216,7 @@ export const InventoryProvider = ({ children }) => {
         setEditBook,
         addBook,
         setAddBook,
+        notifications,
       }}
     >
       {children}
