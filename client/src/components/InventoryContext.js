@@ -40,9 +40,14 @@ export const InventoryProvider = ({ children }) => {
 
   // Set All books by page and library useEffect
   useEffect(() => {
+    const token = localStorage.getItem("userBPToken");
+
     const query = selectedlibrary ? "?library=" + selectedlibrary : "";
     fetch("/api/books/pages/" + inventoryPage + query, {
       method: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
     })
       .then((res) => {
         return res.json();
@@ -67,6 +72,7 @@ export const InventoryProvider = ({ children }) => {
 
   // Delete Book useEffect
   useEffect(() => {
+    const token = localStorage.getItem("userBPToken");
     const awaitFetch = async () => {
       try {
         let query = deleteBook.libraryId
@@ -78,6 +84,9 @@ export const InventoryProvider = ({ children }) => {
 
         const res = await fetch(query, {
           method: "DELETE",
+          headers: {
+            Authorization: "Bearer " + token, // from local storage
+          },
         });
 
         const data = await res.json();
@@ -100,6 +109,7 @@ export const InventoryProvider = ({ children }) => {
 
   // Add Book useEffect
   useEffect(() => {
+    const token = localStorage.getItem("userBPToken");
     const awaitFetch = async () => {
       try {
         let query = "/api/books";
@@ -110,6 +120,7 @@ export const InventoryProvider = ({ children }) => {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
           },
         });
 
@@ -133,6 +144,7 @@ export const InventoryProvider = ({ children }) => {
 
   // Edit Book useEffect
   useEffect(() => {
+    const token = localStorage.getItem("userBPToken");
     const awaitFetch = async () => {
       try {
         const libraryQuery = editBook.libraryId
@@ -147,6 +159,7 @@ export const InventoryProvider = ({ children }) => {
             headers: {
               Accept: "application/json",
               "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
             },
           }
         );
@@ -170,6 +183,7 @@ export const InventoryProvider = ({ children }) => {
 
   // Book Stock Inc/Dec useEffect
   useEffect(() => {
+    const token = localStorage.getItem("userBPToken");
     const awaitFetch = async () => {
       try {
         const res = await fetch(
@@ -181,6 +195,9 @@ export const InventoryProvider = ({ children }) => {
             stockIncDec.libraryId,
           {
             method: "PUT",
+            headers: {
+              Authorization: "Bearer " + token, // from local storage
+            },
           }
         );
 

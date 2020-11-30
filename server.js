@@ -19,6 +19,25 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static("assets"));
 
+const verifyToken = (req, res, next) => {
+  if (req.path == "/api/auth/login" || req.path == "/") return next();
+
+  //authenticate user
+
+  // Get auth header value
+  const bearerHeader = req.headers["authorization"];
+  if (bearerHeader) {
+    console.log("bearerHeader", bearerHeader);
+    const bearer = bearerHeader.split(" ");
+    const bearerToken = bearer[1];
+    req.token = bearerToken;
+    next();
+  } else {
+    res.status(403);
+  }
+};
+app.all("*", verifyToken);
+
 // Auth api
 app.use("/api/auth", auth);
 

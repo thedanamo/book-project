@@ -40,12 +40,19 @@ router.param("id", isIdNumber);
 
 // Endpoint to return all books
 router.get("/", (req, res) => {
-  queries.getAll().then((books) => {
-    if (books) {
-      res.json(books);
+  jwt.verify(req.token, "thesecret", (err, authData) => {
+    if (err) {
+      res.status(403);
     } else {
-      res.status(404);
-      next(new Error("No books in database"));
+      console.log(authData);
+      queries.getAll().then((books) => {
+        if (books) {
+          res.json(books);
+        } else {
+          res.status(404);
+          next(new Error("No books in database"));
+        }
+      });
     }
   });
 });
