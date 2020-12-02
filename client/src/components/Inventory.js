@@ -50,7 +50,6 @@ function Inventory() {
         <h4>Notifications</h4>
         <NotificationContainer>
           {notifications.map((book) => {
-            console.log(book.title);
             return <div>{book.title}</div>;
           })}
         </NotificationContainer>

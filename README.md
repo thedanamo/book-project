@@ -24,6 +24,12 @@ https://github.com/benoitvallon/100-best-books
 
 # Instructions:
 
+- Put the following in a .env file in BOOK-PROJECT folder (the main server folder)
+  ```
+  DB_NAME=<database name>
+  DB_USER=<user name>
+  DB_PASSWORD=<password>
+  ```
 - Run the Migrations and then Seeds
 - To start you must run "yarn dev" in terminal from the main project folder and then "yarn start" from the client folder.
 - LOGIN with

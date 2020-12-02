@@ -5,12 +5,17 @@ import React, { useState, useContext } from "react";
 import { AuthContext } from "./AuthContext";
 
 const Header = () => {
-  const { user, setUserLoggingInfo } = useContext(AuthContext);
+  const { user, setUser, setUserLoggingInfo } = useContext(AuthContext);
 
   const [loginInfo, setLoginInfo] = useState({});
 
   const attemptLogin = () => {
     setUserLoggingInfo({ ...loginInfo });
+  };
+
+  const logout = () => {
+    localStorage.setItem("BP_User", "");
+    setUser(null);
   };
 
   return (
@@ -48,7 +53,18 @@ const Header = () => {
         <h4>{user.username}</h4>
       )}
       <StyledLogo src={logo} className="App-logo" alt="logo" />
-      <div></div>
+      <div>
+        {user && (
+          <StyledButton
+            variant="primary"
+            onClick={() => {
+              logout();
+            }}
+          >
+            Logout
+          </StyledButton>
+        )}
+      </div>
     </StyledHeader>
   );
 };

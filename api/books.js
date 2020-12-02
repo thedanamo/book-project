@@ -144,7 +144,6 @@ router.put("/increment/:id", (req, res, next) => {
   try {
     queries.increment(id, libraryId).then((library_books) => {
       res.json(library_books[0]);
-      console.log(library_books[0]);
     });
   } catch (err) {
     res.status(400);

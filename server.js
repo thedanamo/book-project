@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
@@ -21,7 +22,7 @@ app.use(cookieParser());
 app.use(express.static("assets"));
 
 const verifyToken = async (req, res, next) => {
-  console.log("*******VRIFY", req.path, req.headers.authorization);
+  console.log("Verify Token", req.path, req.headers.authorization);
   const bearerHeader = req.headers["authorization"];
 
   if (!bearerHeader) {
@@ -39,11 +40,8 @@ const verifyToken = async (req, res, next) => {
       err.status = 403;
       next(err);
     } else {
-      console.log("BearerHeader", bearerHeader);
-      req.token = bearerToken;
       next();
     }
-    console.log(authData, req.token);
   });
 };
 

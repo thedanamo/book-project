@@ -2,19 +2,9 @@ module.exports = {
   development: {
     client: "pg",
     connection: {
-      database: "bookdb",
-      user: "thedy",
-      password: "wakata",
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
     },
-    //connection: "postgres://localhost/bookdb",
   },
-
-  // production: {
-  //   client: "postgresql",
-  //   connection: {
-  //     database: "bookdb",
-  //     user: "thedy",
-  //     password: "wakata",
-  //   },
-  // },
 };
