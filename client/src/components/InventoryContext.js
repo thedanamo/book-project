@@ -43,16 +43,15 @@ export const InventoryProvider = ({ children }) => {
   // Set All books by page and library useEffect
   useEffect(() => {
     const query = selectedlibrary ? "?library=" + selectedlibrary : "";
-    fetch("/api/books/pages/" + inventoryPage + query, {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + (user ? user.token : ""),
-      },
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((pagination) => {
+    (async () => {
+      try {
+        const res = await fetch("/api/books/pages/" + inventoryPage + query, {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + (user ? user.token : ""),
+          },
+        });
+        const pagination = await res.json();
         if (!pagination.error) {
           console.log(pagination);
           const { books, last_page } = pagination;
@@ -62,11 +61,11 @@ export const InventoryProvider = ({ children }) => {
         } else {
           setStatus("Loading");
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         setStatus("error");
         console.log(error);
-      });
+      }
+    })();
 
     return () => {
       setStatus("loading");
