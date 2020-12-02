@@ -14,7 +14,7 @@ const Header = () => {
   };
 
   const logout = () => {
-    localStorage.setItem("BP_User", "");
+    localStorage.removeItem("BP_User");
     setUser(null);
   };
 
