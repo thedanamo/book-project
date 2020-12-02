@@ -11,14 +11,17 @@ const emptyArrayAccess = () => {
 const emptyBooks = emptyArrayAccess();
 
 // Finds and adds book to newEmptyStockBooks list
-const addEmptyBookToList = (id) => {
-  queries.getBook(id).then((book) => {
+const addEmptyBookToList = async (id) => {
+  try {
+    const book = await queries.getBook(id);
     if (book) {
       emptyBooks.newEmptyStockBooks.push(book);
     } else {
-      console.log(new Error("Book with id " + id + " not found"));
+      throw new Error("Book with id " + id + " not found");
     }
-  });
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Middleware to validate that given id is a number
@@ -40,131 +43,158 @@ router.param("id", isIdNumber);
 
 // Endpoint to return all books
 router.get("/", async (req, res) => {
-  queries.getAll().then((books) => {
-    if (books) {
-      res.json(books);
-    } else {
-      res.status(404);
-      next(new Error("No books in database"));
-    }
-  });
+  try {
+    const books = await queries.getAll();
+    res.json(books);
+  } catch (error) {
+    const err = new Error(error.message);
+    err.status(500);
+    next(err);
+  }
 });
 
 // Endpoint to add book to db
-router.post("/", (req, res, next) => {
+router.post("/", async (req, res, next) => {
   const givenBook = req.body;
   if (isValidBook(givenBook)) {
-    queries.create(givenBook).then((books) => {
+    try {
+      const books = await queries.create(givenBook);
       res.status(201).json(books[0]);
-    });
+    } catch (error) {
+      const err = new Error(error.message);
+      err.status(500);
+      next(err);
+    }
   } else {
-    res.status(400);
-    next(new Error("Invalid book object"));
+    const err = new Error("Invalid book object");
+    err.status(400);
+    next(err);
   }
 });
 
 // Endpoint to add book to library
-router.post("/add", (req, res, next) => {
+router.post("/add", async (req, res, next) => {
   const { id, stock } = req.body;
   const { libraryId } = req.query;
   if (id && libraryId) {
-    stock = stock ? stock : 1;
-    queries.addBookToLibrary({ id, stock }, libraryId).then((library_books) => {
+    try {
+      stock = stock ? stock : 1;
+      const library_books = await queries.addBookToLibrary(
+        { id, stock },
+        libraryId
+      );
       res.status(201).json(library_books[0]);
-    });
+    } catch (error) {
+      const err = new Error(error.message);
+      err.status(500);
+      next(err);
+    }
   } else {
-    res.status(400);
-    next(new Error("Invalid book info"));
+    const err = new Error("Invalid book info");
+    err.status(400);
+    next(err);
   }
 });
 
 // Endpoint to return a book by given id
-router.get("/:id", (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
-
-  queries.getBook(id).then((book) => {
+  try {
+    const book = await queries.getBook(id);
     if (book) {
       res.json(book);
     } else {
-      res.status(404);
-      next(new Error("Book with id " + id + " not found"));
+      const err = new Error("Book with id " + id + " not found");
+      err.status(404);
+      next(err);
     }
-  });
+  } catch (error) {
+    const err = new Error(error.message);
+    err.status(500);
+    next(err);
+  }
 });
 
 // Endpoint to find and update book with given id in the db
-router.put("/:id", (req, res, next) => {
+router.put("/:id", async (req, res, next) => {
   const { id } = req.params;
   const { libraryId } = req.query;
   const updateBook = req.body;
 
-  if (isValidBook(updateBook)) {
-    queries.update(id, updateBook, libraryId).then((books) => {
+  try {
+    if (isValidBook(updateBook)) {
+      const book = await queries.update(id, updateBook, libraryId);
       res.json(books[0]);
 
       if (books[0].stock === 0) {
-        addEmptyBookToList(id);
+        await addEmptyBookToList(id);
       }
-    });
-  } else {
-    res.status(400);
-    next(new Error("Invalid book object"));
+    } else {
+      res.status(400);
+      next(new Error("Invalid book object"));
+    }
+  } catch (error) {
+    const err = new Error(error.message);
+    err.status(500);
+    next(err);
   }
 });
 
 // Endpoint to delete book with given id
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
   const { libraryId } = req.query;
-  if (libraryId) {
-    queries.delete(id, libraryId).then((library_books) => {
+  try {
+    if (libraryId) {
+      const library_books = await queries.delete(id, libraryId);
       if (library_books) {
         res.json(library_books);
       } else {
-        res.status(404);
-        next(new Error("Error deleting book from library"));
+        const err = new Error("Error deleting book from library");
+        err.status(404);
+        next(err);
       }
-    });
-  } else {
-    queries.delete(id).then((books) => {
+    } else {
+      const books = await queries.delete(id);
       if (books) {
         res.json(books);
       } else {
         res.status(404);
         next(new Error("No books in database"));
       }
-    });
+    }
+  } catch (error) {
+    const err = new Error(error.message);
+    err.status(500);
+    next(err);
   }
 });
 
 // Endpoint to increment stock of book with given id
-router.put("/increment/:id", (req, res, next) => {
+router.put("/increment/:id", async (req, res, next) => {
   const { id } = req.params;
   const { libraryId } = req.query;
   try {
-    queries.increment(id, libraryId).then((library_books) => {
-      res.json(library_books[0]);
-    });
+    const library_books = await queries.increment(id, libraryId);
+    res.json(library_books[0]);
   } catch (err) {
-    res.status(400);
+    res.status(500);
     next(new Error(err.message));
   }
 });
 
 // Endpoint to decrement stock of book with given id
-router.put("/decrement/:id", (req, res, next) => {
+router.put("/decrement/:id", async (req, res, next) => {
   const { id } = req.params;
   const { libraryId } = req.query;
   try {
-    queries.decrement(id, libraryId).then((library_books) => {
-      res.json(library_books[0]);
-
-      if (library_books[0].stock === 0) {
-        addEmptyBookToList(id);
-      }
-    });
+    const library_books = await queries.decrement(id, libraryId);
+    res.json(library_books[0]);
+    if (library_books[0].stock === 0) {
+      await addEmptyBookToList(id);
+    }
   } catch (err) {
-    res.status(400);
+    res.status(500);
     next(new Error(err.message));
   }
 });
