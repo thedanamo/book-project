@@ -7,6 +7,7 @@ const auth = require("./api/auth");
 let { router: books, emptyBooks } = require("./api/books");
 
 const port = process.env.PORT || 9001;
+const jwt = require("jsonwebtoken");
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
   cors: true,
@@ -19,25 +20,37 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static("assets"));
 
-const verifyToken = (req, res, next) => {
-  if (req.path == "/api/auth/login" || req.path == "/") return next();
-
-  // Get auth header value
+const verifyToken = async (req, res, next) => {
+  console.log("*******VRIFY", req.path, req.headers.authorization);
   const bearerHeader = req.headers["authorization"];
-  if (bearerHeader) {
-    console.log("bearerHeader", bearerHeader);
-    const bearer = bearerHeader.split(" ");
-    const bearerToken = bearer[1];
-    req.token = bearerToken;
-    next();
-  } else {
-    res.status(403);
+
+  if (!bearerHeader) {
+    const err = new Error("BearerHeader Not Found");
+    err.status = 403;
+    return next(err);
   }
+  const bearer = bearerHeader.split(" ");
+  const bearerToken = bearer[1];
+
+  jwt.verify(bearerToken, "thesecret", (err, authData) => {
+    // Get auth header value
+    if (err) {
+      const err = new Error("Token not verified");
+      err.status = 403;
+      next(err);
+    } else {
+      console.log("BearerHeader", bearerHeader);
+      req.token = bearerToken;
+      next();
+    }
+    console.log(authData, req.token);
+  });
 };
-app.all("*", verifyToken);
 
 // Auth api
 app.use("/api/auth", auth);
+
+app.use(verifyToken);
 
 // Book api
 app.use("/api/books", books);

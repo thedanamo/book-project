@@ -5,9 +5,7 @@ import React, { useState, useContext } from "react";
 import { AuthContext } from "./AuthContext";
 
 const Header = () => {
-  const { status, user, userLoggingInfo, setUserLoggingInfo } = useContext(
-    AuthContext
-  );
+  const { user, setUserLoggingInfo } = useContext(AuthContext);
 
   const [loginInfo, setLoginInfo] = useState({});
 

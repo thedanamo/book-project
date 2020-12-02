@@ -29,6 +29,7 @@ router.post("/login", (req, res, next) => {
 
         jwt.sign({ user }, "thesecret", (err, token) => {
           user.token = token;
+          delete user.password;
           res.json(user);
           console.log("LOGGED IN");
         });
@@ -40,6 +41,39 @@ router.post("/login", (req, res, next) => {
   } else {
     res.status(400);
     next(new Error("Invalid user object"));
+  }
+});
+
+// Endpoint to return a user by given username
+router.post("/verify", async (req, res, next) => {
+  const { username, token } = req.body;
+  try {
+    const verification = new Promise((resolve, reject) => {
+      jwt.verify(token, "thesecret", (error) => {
+        if (error) {
+          const err = new Error("Token not verified");
+          err.status = 403;
+          reject(err);
+        } else {
+          console.log("verified ls user", req.body);
+          resolve(token);
+        }
+      });
+    });
+
+    req.token = await verification;
+
+    const user = await queries.get(username);
+    if (user) {
+      delete user.password;
+      user.token = token;
+      res.status(200).json(user);
+    } else {
+      res.status(404);
+      throw new Error("User with username " + username + " not found");
+    }
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -62,6 +96,7 @@ router.get("/:username", (req, res, next) => {
 
   queries.get(username).then((user) => {
     if (user) {
+      delete user.password;
       res.status(200).json(user);
     } else {
       res.status(404);

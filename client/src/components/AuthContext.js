@@ -7,27 +7,45 @@ export const AuthProvider = ({ children }) => {
   const [userLoggingInfo, setUserLoggingInfo] = useState(null);
   const [status, setStatus] = useState("loading");
 
-  useEffect(() => {
-    if (userLoggingInfo) {
-      fetch("/api/auth/login", {
+  const fetchLogin = async (userLoginInfo) => {
+    const url = userLoginInfo.password ? "/api/auth/login" : "/api/auth/verify";
+
+    try {
+      const res = await fetch(url, {
         method: "POST",
-        body: JSON.stringify({ ...userLoggingInfo }),
+        body: JSON.stringify({ ...userLoginInfo }),
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-      })
-        .then((res) => {
-          return res.json();
-        })
-        .then((user) => {
-          localStorage.setItem("userBPToken", user.token);
-          user.username && setUser(user);
-        })
-        .catch((error) => {
-          setStatus("error");
-          console.log(error);
-        });
+      });
+
+      const body = await res.json();
+      if (!res.ok) {
+        throw new Error(body.message);
+      }
+
+      const user = body;
+
+      localStorage.setItem("BP_User", JSON.stringify(user));
+
+      user.username && setUser(user);
+      console.log(user);
+    } catch (error) {
+      setStatus("error");
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("BP_User"));
+    user && fetchLogin(user);
+    console.log("local storage user: ", user);
+  }, []);
+
+  useEffect(() => {
+    if (userLoggingInfo) {
+      fetchLogin(userLoggingInfo);
     }
 
     return () => {

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "./AuthContext";
 
 const io = require("socket.io-client");
 const socket = io("http://localhost:9001");
@@ -18,6 +19,7 @@ export const InventoryProvider = ({ children }) => {
   const [deletedBook, setDeletedBook] = useState(false);
   const [editBook, setEditBook] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     socket.on("receive empty notifications", (payload) => {
@@ -40,23 +42,26 @@ export const InventoryProvider = ({ children }) => {
 
   // Set All books by page and library useEffect
   useEffect(() => {
-    const token = localStorage.getItem("userBPToken");
-
     const query = selectedlibrary ? "?library=" + selectedlibrary : "";
     fetch("/api/books/pages/" + inventoryPage + query, {
       method: "GET",
       headers: {
-        Authorization: "Bearer " + token,
+        Authorization: "Bearer " + (user ? user.token : ""),
       },
     })
       .then((res) => {
         return res.json();
       })
       .then((pagination) => {
-        const { books, last_page } = pagination;
-        setAllBooks([...books]);
-        setLastPage(last_page);
-        setStatus("success");
+        if (!pagination.error) {
+          console.log(pagination);
+          const { books, last_page } = pagination;
+          setAllBooks([...books]);
+          setLastPage(last_page);
+          setStatus("success");
+        } else {
+          setStatus("Loading");
+        }
       })
       .catch((error) => {
         setStatus("error");
@@ -68,11 +73,10 @@ export const InventoryProvider = ({ children }) => {
       setDeletedBook(false);
       setAddedBook(false);
     };
-  }, [inventoryPage, selectedlibrary, deletedBook, addedBook]);
+  }, [inventoryPage, selectedlibrary, deletedBook, addedBook, user]);
 
   // Delete Book useEffect
   useEffect(() => {
-    const token = localStorage.getItem("userBPToken");
     const awaitFetch = async () => {
       try {
         let query = deleteBook.libraryId
@@ -85,7 +89,7 @@ export const InventoryProvider = ({ children }) => {
         const res = await fetch(query, {
           method: "DELETE",
           headers: {
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + (user ? user.token : ""),
           },
         });
 
@@ -109,7 +113,6 @@ export const InventoryProvider = ({ children }) => {
 
   // Add Book useEffect
   useEffect(() => {
-    const token = localStorage.getItem("userBPToken");
     const awaitFetch = async () => {
       try {
         let query = "/api/books";
@@ -120,7 +123,7 @@ export const InventoryProvider = ({ children }) => {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + (user ? user.token : ""),
           },
         });
 
@@ -144,7 +147,6 @@ export const InventoryProvider = ({ children }) => {
 
   // Edit Book useEffect
   useEffect(() => {
-    const token = localStorage.getItem("userBPToken");
     const awaitFetch = async () => {
       try {
         const libraryQuery = editBook.libraryId
@@ -159,7 +161,7 @@ export const InventoryProvider = ({ children }) => {
             headers: {
               Accept: "application/json",
               "Content-Type": "application/json",
-              Authorization: "Bearer " + token,
+              Authorization: "Bearer " + (user ? user.token : ""),
             },
           }
         );
@@ -183,7 +185,6 @@ export const InventoryProvider = ({ children }) => {
 
   // Book Stock Inc/Dec useEffect
   useEffect(() => {
-    const token = localStorage.getItem("userBPToken");
     const awaitFetch = async () => {
       try {
         const res = await fetch(
@@ -196,7 +197,7 @@ export const InventoryProvider = ({ children }) => {
           {
             method: "PUT",
             headers: {
-              Authorization: "Bearer " + token,
+              Authorization: "Bearer " + (user ? user.token : ""),
             },
           }
         );
